@@ -9,15 +9,12 @@ contract Summer42NFT is ERC721URIStorage {
     // Je conserve l'adresse qui déploie le contrat et j'interdis sa modification.
     address public immutable creator;
 
-    // Je choisis l'identifiant 1 pour l'unique NFT de ce contrat.
-    uint256 public constant TOKEN_ID = 1;
+    // Je compte les NFT créés ; cette valeur vaut 0 au déploiement.
+    uint256 public totalMinted;
 
     // Je conserve le lien IPFS des métadonnées, qui contiennent le lien de l'image.
     string private constant METADATA_URI =
         "ipfs://bafkreiajbqd4lji4qvvz4f7kfycfvpyebmdztmnlzoa3j7qlrizx3k4nnu";
-
-    // Je mémorise si le NFT a déjà été créé ; cette valeur vaut false au départ.
-    bool public minted;
 
     // Je définis le nom et le symbole, puis je mémorise l'adresse de déploiement.
     // Je ne crée aucun NFT dans le constructeur.
@@ -29,18 +26,18 @@ contract Summer42NFT is ERC721URIStorage {
         // Je réserve la création du NFT à l'adresse qui a déployé le contrat.
         require(msg.sender == creator, "Only creator can mint");
 
-        // Je refuse une nouvelle création si le NFT a déjà été créé.
-        require(!minted, "NFT already minted");
+        // Je choisis un nouvel identifiant : 1, puis 2, puis 3, etc.
+        uint256 tokenId = totalMinted + 1;
 
-        // Je bloque toute nouvelle création avant un éventuel appel au destinataire.
+        // Je mémorise cet identifiant avant un éventuel appel au destinataire.
         // Je retrouve la valeur précédente si la transaction échoue ensuite.
-        minted = true;
+        totalMinted = tokenId;
 
         // Je crée le NFT pour mon adresse de déploiement.
         // Je vérifie aussi la réception si cette adresse est un contrat.
-        _safeMint(creator, TOKEN_ID);
+        _safeMint(creator, tokenId);
 
         // J'associe le NFT au fichier de métadonnées publié sur IPFS.
-        _setTokenURI(TOKEN_ID, METADATA_URI);
+        _setTokenURI(tokenId, METADATA_URI);
     }
 }

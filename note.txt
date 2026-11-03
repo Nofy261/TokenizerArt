@@ -62,9 +62,13 @@ NFT → métadonnées → image
 OU
 https://ipfs.io/ipfs/bafkreiajbqd4lji4qvvz4f7kfycfvpyebmdztmnlzoa3j7qlrizx3k4nnu
 
-comportement choisis avec les règles proposées :
-- Au déploiement : aucun NFT.
-- Seule l’adresse qui déploie le contrat peut appeler mint.
-- Le premier appel crée le NFT numéro 1, attribué à cette adresse.
-- Ce NFT renvoie vers le lien IPFS des métadonnées.
-- Tout nouvel appel à mint est refusé : je limite ce contrat à un NFT.
+----------------------
+
+nft.sol -> Le contrat :
+- utilise les focntions d'OpenZeppelin
+- memorise le createur du contrat et le nombre de NFT crées
+- définit les règles de mint
+
+
+
+

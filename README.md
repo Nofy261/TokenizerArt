@@ -2,11 +2,11 @@
 
 Notes de la session du **3 novembre 2026**, à réorganiser pour le README final.
 
-**État actuel :** l'image et les métadonnées sont publiées sur IPFS via Pinata. Le contrat est écrit et sa compilation locale a été vérifiée. Le déploiement, le mint et les tests de transactions restent à faire.
+**État actuel :** l'image et les métadonnées sont publiées sur IPFS via Pinata. Le contrat permet désormais plusieurs créations de NFT. Cette nouvelle version reste à compiler et à tester dans Remix, puis à déployer sur BSC Testnet.
 
 ## Objectif du projet
 
-Je crée un NFT associé à une image contenant le nombre 42. Je dois comprendre et pouvoir expliquer toute la chaîne :
+Je crée des NFT associés à une image contenant le nombre 42. Je dois comprendre et pouvoir expliquer toute la chaîne :
 
 ```text
 Créer l'image
@@ -46,13 +46,16 @@ Je conserve BNB Smart Chain Testnet, Remix et MetaMask, que je connais déjà, p
 - Signature des transactions : **MetaMask**.
 - Stockage : **IPFS via Pinata**, espace public et offre gratuite.
 - Contrat : implémentation ERC-721 d'OpenZeppelin avec `ERC721URIStorage`.
-- Un seul NFT au maximum dans ce contrat.
+- Plusieurs NFT peuvent être créés dans ce contrat, sans limite de quantité programmée.
+- Chaque appel réussi à `mint` crée un NFT avec un nouvel identifiant : `1`, puis `2`, puis `3`, etc.
 - Seule l'adresse qui déploie le contrat peut appeler `mint`.
 - Le mint attribue le NFT à cette adresse.
 - Aucun NFT créé dans le constructeur : le mint est une transaction séparée du déploiement.
 - Les imports OpenZeppelin ne fixent pas de version, selon mon choix.
 
-Le sujet n'impose pas cette limite d'un NFT, cette politique de mint, Pinata, Remix ou BSC Testnet. Ce sont mes choix de conception et d'outillage.
+La permission de mint, Pinata, Remix et BSC Testnet sont mes choix de conception et d'outillage.
+
+Pour le moment, tous les NFT renvoient aux mêmes métadonnées et à l'image « summer 42 ». Ils restent distincts grâce à leurs `tokenId` et peuvent être transférés séparément.
 
 ## Organisation du dépôt
 
@@ -86,7 +89,7 @@ Le sujet ne précise pas où ranger localement l'image. Je la conserve dans `doc
 
 Un NFT est un type de token : un **token non fongible**.
 
-Mon NFT est identifié individuellement par son `tokenId`, fixé à `1` dans ce contrat. Il n'est pas découpé en unités décimales.
+Chaque NFT est identifié individuellement par son `tokenId`, attribué lors du mint. Le premier a l'identifiant `1`, le suivant `2`, etc. Un NFT n'est pas découpé en unités décimales.
 
 Le `tokenId` est unique dans un contrat, pas dans toutes les blockchains. Pour identifier précisément un NFT, il faut le réseau, l'adresse du contrat et son `tokenId`.
 
@@ -195,7 +198,7 @@ L'image et les métadonnées sont deux fichiers distincts, avec deux CID différ
 ```text
 BSC Testnet
 └── Contrat Summer42NFT, identifié par son adresse future
-    └── NFT identifié par son tokenId = 1, après le mint
+    └── Premier NFT, identifié par son tokenId = 1, après le premier mint
         ├── Propriétaire : consultable avec ownerOf(1)
         └── tokenURI(1) → lien IPFS de metadata.json
                               ├── name : summer 42
@@ -214,43 +217,43 @@ Les métadonnées contiennent un lien vers l'image, pas le fichier image lui-mê
 - Symbole retourné par `symbol()` : `SUM42`.
 - Pragma Solidity : `^0.8.24`.
 - Dépendance : `ERC721URIStorage` d'OpenZeppelin, sans version fixée dans l'import.
-- Identifiant du NFT : `1`.
+- Identifiants des NFT : `1`, `2`, `3`, etc., attribués au fil des appels à `mint`.
 
 `ERC721URIStorage` apporte les fonctions standard, dont `ownerOf`, `balanceOf`, les transferts et la consultation du lien des métadonnées. Notre code ajoute les règles de mint.
 
 ### Variables et constructeur
 
 - `creator` : adresse qui déploie le contrat. Elle est `immutable`, donc fixée au déploiement et ensuite non modifiable.
-- `TOKEN_ID` : constante égale à `1`.
+- `totalMinted` : compteur initialement égal à `0`, qui mémorise le nombre de NFT créés et permet de choisir le prochain identifiant.
 - `METADATA_URI` : constante contenant le lien IPFS des métadonnées.
-- `minted` : booléen initialement égal à `false`, qui mémorise si le NFT a été créé.
 - `constructor()` : définit le nom et le symbole, puis enregistre `msg.sender` dans `creator`. Il ne crée pas de NFT.
 - `msg.sender` : adresse qui appelle le contrat ; dans notre déploiement direct depuis Remix et MetaMask, il s'agit du compte de déploiement.
 
 ### Fonction mint
 
-`mint()` est une fonction externe sans paramètre. Le destinataire, le tokenId et le lien des métadonnées sont définis dans le code.
+`mint()` est une fonction externe sans paramètre. Le destinataire et le lien des métadonnées sont définis dans le code. L'identifiant est calculé à partir du compteur.
 
 ```text
 Vérifier que l'appelant est creator
-    → vérifier que minted vaut false
-    → passer minted à true
-    → créer le NFT numéro 1 pour creator avec _safeMint
+    → calculer tokenId = totalMinted + 1
+    → mettre à jour totalMinted
+    → créer le NFT de cet identifiant pour creator avec _safeMint
     → associer le lien des métadonnées avec _setTokenURI
 ```
 
 - Un `require` refuse la transaction si sa condition n'est pas satisfaite.
-- `minted` passe à `true` avant `_safeMint` pour empêcher une nouvelle création pendant un éventuel appel au destinataire.
+- Le compteur est mis à jour avant `_safeMint` pour réserver un nouvel identifiant avant un éventuel appel au destinataire. Cet identifiant est conservé dans la variable locale `tokenId` pendant l'appel.
 - `_safeMint` crée le NFT et vérifie la capacité de réception si le destinataire est un contrat.
 - `_setTokenURI` associe le NFT au lien des métadonnées déjà publiées ; il n'envoie aucun fichier sur IPFS.
-- Si une étape échoue, les modifications de la transaction sont annulées, y compris le changement de `minted`.
+- Si une étape échoue, les modifications de la transaction sont annulées, y compris la mise à jour de `totalMinted`.
 
 Résultat attendu :
 
 ```text
 Déploiement réussi → contrat présent, aucun NFT
 Premier mint réussi → NFT numéro 1 attribué à creator
-Nouvel appel à mint → refus
+Deuxième mint réussi → NFT numéro 2 attribué à creator
+Troisième mint réussi → NFT numéro 3 attribué à creator
 Appel par une autre adresse → refus
 ```
 
@@ -273,23 +276,25 @@ Le déroulement prévu est :
 7. Attendre la validation du réseau et conserver l'adresse du contrat.
 8. Retrouver le contrat dans « Deployed Contracts » dans Remix.
 9. Appeler `mint` avec le même compte et confirmer cette deuxième transaction dans MetaMask.
-10. Vérifier le résultat et les permissions.
+10. Répéter le mint pour vérifier la création de plusieurs NFT, puis vérifier le résultat et les permissions.
 
-La compilation locale ne nécessite pas de transaction. Le déploiement et le mint sont deux transactions distinctes, avec des frais payés en tBNB de test, sans argent réel.
+La compilation locale ne nécessite pas de transaction. Le déploiement et chaque appel à `mint` sont des transactions distinctes, avec des frais payés en tBNB de test, sans argent réel.
 
 L'appel externe à `mint` sur BSC Testnet nécessite que le contrat soit déjà déployé et accessible à une adresse.
 
 ## Vérifications à effectuer après le déploiement
 
-- Avant le mint : `minted()` doit retourner `false` et `balanceOf(creator)` doit retourner `0`.
+- Avant le premier mint : `totalMinted()` et `balanceOf(creator)` doivent retourner `0`.
 - Avant le mint : `ownerOf(1)` et `tokenURI(1)` doivent refuser la consultation d'un token qui n'existe pas encore.
 - Avec un autre compte : `mint()` doit être refusé, sans créer de NFT.
 - Avec le compte de déploiement : le premier `mint()` doit réussir.
-- Après le mint : `minted()` doit retourner `true` et `balanceOf(creator)` doit retourner `1`, tant que le NFT n'a pas été transféré.
+- Après le premier mint : `totalMinted()` et `balanceOf(creator)` doivent retourner `1`, tant que le NFT n'a pas été transféré.
 - `ownerOf(1)` doit retourner l'adresse de déploiement juste après la création.
 - `tokenURI(1)` doit retourner le lien IPFS des métadonnées indiqué plus haut.
 - Les métadonnées doivent renvoyer vers l'image « summer 42 », qui doit s'afficher.
-- Un deuxième appel à `mint()` doit être refusé.
+- Un deuxième appel autorisé à `mint()` doit réussir et créer le NFT numéro `2`, puis un troisième le numéro `3`.
+- Chaque nouveau NFT doit avoir le bon propriétaire et renvoyer vers les métadonnées de « summer 42 ».
+- Après trois créations : `totalMinted()` doit retourner `3` ; les appels non autorisés ne doivent pas modifier ce compteur.
 - Le transfert du NFT et les permissions de transfert seront également à vérifier pour démontrer son fonctionnement.
 
 La vérification de propriété porte sur le NFT. Le contrat enregistre la possession du token associé à l'image, pas la possession de toutes les copies du fichier image.
@@ -302,8 +307,8 @@ La vérification de propriété porte sur le NFT. Le contrat enregistre la posse
 | Adresse du contrat | À renseigner après déploiement |
 | Adresse du compte de déploiement | À renseigner |
 | Transaction de déploiement | À renseigner |
-| Transaction de mint | À renseigner |
-| TokenId prévu | `1` |
+| Transactions de mint | À renseigner pour chaque création |
+| TokenId | `1`, puis `2`, puis `3`, etc. |
 | Propriétaire après mint | À vérifier avec `ownerOf(1)` |
 | Compilateur et paramètres utilisés dans Remix | À renseigner |
 
@@ -315,11 +320,11 @@ La vérification de propriété porte sur le NFT. Le contrat enregistre la posse
 - [x] Préparer un fichier JSON avec le titre, le login et le lien de l'image.
 - [x] Publier les métadonnées sur IPFS et conserver leur CID.
 - [x] Vérifier l'affichage de l'image et du JSON dans le navigateur.
-- [x] Écrire un premier contrat commenté et vérifier sa compilation locale.
+- [x] Écrire le contrat commenté permettant plusieurs créations de NFT.
 - [ ] Comprendre et réécrire le contrat progressivement.
 - [ ] Compiler et relever les paramètres dans Remix.
 - [ ] Déployer sur BSC Testnet.
-- [ ] Appeler `mint` pour créer le NFT.
+- [ ] Appeler `mint` plusieurs fois pour créer des NFT avec des identifiants distincts.
 - [ ] Vérifier propriété, métadonnées, affichage, refus des appels non autorisés et transferts.
 - [ ] Compléter les fichiers et informations de déploiement et de mint.
 - [ ] Inscrire l'adresse du contrat et le réseau dans le dépôt.
