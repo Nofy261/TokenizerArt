@@ -1,0 +1,27 @@
+Structure attendue:
+TokenizerArt/
+├── README.md
+├── code/
+├── deployment/
+├── mint/
+└── documentation/
+
+L'image est l'oeuvre ; le NFT est le token auquel elle est assiciee
+
+Creer une image(avec un 42) avec un numero(identifiant)
+Stocker cette image sur IFPS et aussi 
+Fiche de descprition de l'image = les metadonnées(titre,auteur,lien vers l'image)
+Le certificat numeroté de l'image = le NFT , identifié par son tokenId dans un contrat
+Le registre public des certificats et propriétaires = la blockchain
+Le programme qui applique les règles du registre = le smart contrat
+
+Objectif:
+Creer une image - preparer sa fiche descriptive - programmer le registre
+inscrire le NFT sur le blockchain de test
+
+BNB Smart Chain Testnet
+└── Contrat NFT
+    └── NFT n° 1
+        ├── Propriétaire : adresse de ton wallet
+        └── Référence vers les métadonnées sur IPFS
+            └── Référence vers ton image sur IPFS
