@@ -25,3 +25,46 @@ BNB Smart Chain Testnet
         ├── Propriétaire : adresse de ton wallet
         └── Référence vers les métadonnées sur IPFS
             └── Référence vers ton image sur IPFS
+
+Le but du projet est de créer ton propre NFT et de comprendre toute la chaîne :
+1. Tu crées une image contenant 42 : c’est ton œuvre.
+2. Tu stockes cette image sur un système distribué, comme IPFS.
+3. Tu prépares sa fiche descriptive, appelée métadonnées : titre comprenant 42, ton login comme artiste et lien vers l’image.
+4. Tu développes et déploies un contrat sur une blockchain de test.
+5. Tu crées ton NFT avec ce contrat : il possède un identifiant, un propriétaire et une référence vers les métadonnées.
+Le résultat attendu est donc : un NFT associé à ton image, dont tu peux vérifier le propriétaire et afficher l’œuvre.
+
+----------------
+
+Déploiement → contrat présent, aucun NFT
+Appel à mint → création du NFT n° 1 pour mon adresse
+Nouvel appel à mint → refus, car ma limite serait de 1
+
+ordre :
+1. Créer ton image contenant 42 et choisir son titre.
+2. Préparer le stockage : envoyer l’image sur IPFS, créer les métadonnées avec son lien, puis envoyer les métadonnées sur IPFS.
+3. Écrire le contrat, avec les règles choisies et la fonction mint.
+4. Déployer le contrat sur BNB Smart Chain Testnet.
+5. Appeler mint pour créer ton NFT associé aux métadonnées.
+6. Vérifier le résultat : propriétaire, métadonnées et affichage de l’image.
+
+
+lien IPFS de mon image
+ipfs://bafybeighjfynytzxkka47r2654lbubwdea4ohf2ym2jxo23wd4hcbrvyq4
+
+Pinata conserve l'image et la rend disponible sur IPFS.
+Mon image est stockée sur IPFS via Pinata.
+
+le lien IPFS de mes métadonnées
+ipfs://bafkreiajbqd4lji4qvvz4f7kfycfvpyebmdztmnlzoa3j7qlrizx3k4nnu
+-> ce lien sera utlisé par le contrat pour retrouver la fiche de mon NFT
+NFT → métadonnées → image
+OU
+https://ipfs.io/ipfs/bafkreiajbqd4lji4qvvz4f7kfycfvpyebmdztmnlzoa3j7qlrizx3k4nnu
+
+comportement choisis avec les règles proposées :
+- Au déploiement : aucun NFT.
+- Seule l’adresse qui déploie le contrat peut appeler mint.
+- Le premier appel crée le NFT numéro 1, attribué à cette adresse.
+- Ce NFT renvoie vers le lien IPFS des métadonnées.
+- Tout nouvel appel à mint est refusé : je limite ce contrat à un NFT.
