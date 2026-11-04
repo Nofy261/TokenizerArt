@@ -69,6 +69,23 @@ nft.sol -> Le contrat :
 - memorise le createur du contrat et le nombre de NFT crées
 - définit les règles de mint
 
+------------------
+
+Ton contrat : une seule adresse
+├── Premier appel à mint → NFT n° 1 → propriétaire : A
+├── Deuxième appel à mint → NFT n° 2 → propriétaire : A
+└── Troisième appel à mint → NFT n° 3 → propriétaire : B, après un transfert
+
+Adresse du contrat
+0x0631a4BB9eC05C6CdBbbC1A650824417074258bC
 
 
-
+Ce que nous avons fait :
+- Créé l’image « summer 42 » et ses métadonnées, puis publié les deux sur IPFS via Pinata.
+- Écrit le contrat permettant au seul déployeur de créer plusieurs NFT.
+- Déployé le contrat.
+- Créé deux NFT et vérifié leurs identifiants, leurs propriétaires et les liens vers les métadonnées et l’image.
+Ce qu’il reste à faire :
+- Tester qu’un autre compte ne peut pas appeler mint.
+- Transférer un NFT et vérifier le changement de propriétaire et les permissions.
+- Compléter le README, la documentation et les informations de déploiement : réseau, adresses, transactions et paramètres de compilation.

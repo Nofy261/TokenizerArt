@@ -2,7 +2,7 @@
 
 Notes de la session du **3 novembre 2026**, à réorganiser pour le README final.
 
-**État actuel :** l'image et les métadonnées sont publiées sur IPFS via Pinata. Le contrat permet désormais plusieurs créations de NFT. Cette nouvelle version reste à compiler et à tester dans Remix, puis à déployer sur BSC Testnet.
+**État actuel :** l'image et les métadonnées sont publiées sur IPFS via Pinata. Le contrat permet plusieurs créations de NFT. Le 4 novembre 2026, j'ai communiqué l'adresse obtenue après le déploiement : `0x0631a4BB9eC05C6CdBbbC1A650824417074258bC`. Le réseau effectif et la transaction de déploiement restent à documenter ; l'accès à l'explorateur n'a pas pu être vérifié par l'assistant. Les appels à `mint` et leurs résultats restent à renseigner.
 
 ## Objectif du projet
 
@@ -197,7 +197,7 @@ L'image et les métadonnées sont deux fichiers distincts, avec deux CID différ
 
 ```text
 BSC Testnet
-└── Contrat Summer42NFT, identifié par son adresse future
+└── Contrat Summer42NFT, identifié par son adresse
     └── Premier NFT, identifié par son tokenId = 1, après le premier mint
         ├── Propriétaire : consultable avec ownerOf(1)
         └── tokenURI(1) → lien IPFS de metadata.json
@@ -304,7 +304,7 @@ La vérification de propriété porte sur le NFT. Le contrat enregistre la posse
 | Information | Valeur actuelle |
 | --- | --- |
 | Réseau prévu | BNB Smart Chain Testnet |
-| Adresse du contrat | À renseigner après déploiement |
+| Adresse du contrat communiquée le 4 novembre 2026 | `0x0631a4BB9eC05C6CdBbbC1A650824417074258bC` |
 | Adresse du compte de déploiement | À renseigner |
 | Transaction de déploiement | À renseigner |
 | Transactions de mint | À renseigner pour chaque création |
@@ -341,7 +341,7 @@ Les bonus ne sont évalués que si toute la partie obligatoire est complète et 
 
 ## Reprise de la prochaine session
 
-**Reprendre la lecture et la réécriture de `code/nft.sol`, expliquer chaque partie, puis préparer la compilation dans Remix.** Ne pas considérer le NFT comme déjà créé : seul le contrat source est prêt pour le moment.
+**Confirmer le réseau et conserver la transaction de déploiement du contrat dont l'adresse est indiquée ci-dessus.** Relever les paramètres de compilation utilisés, consulter `creator` et `totalMinted` dans Remix, puis effectuer et documenter les mints et les vérifications. Le déploiement seul ne crée aucun NFT dans notre contrat.
 
 L'objectif reste de comprendre et de savoir présenter le projet, en privilégiant un accompagnement progressif conformément à `AGENT.md`.
 
