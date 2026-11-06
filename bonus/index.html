@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summer42NFT - Mint</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <h1>Summer42NFT</h1>
+        <p>Mint an NFT on BNB Smart Chain Testnet.</p>
+
+        <button id="connect-wallet" type="button">
+            Connect MetaMask
+        </button>
+
+        <p id="wallet-address">No account connected.</p>
+
+        <button id="mint-nft" type="button" disabled>
+            Mint NFT
+        </button>
+
+        <p id="status" role="status"></p>
+    </main>
+    
+    <script type="module">
+        import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.min.js";
+
+        const connectButton = document.getElementById("connect-wallet");
+        const walletAddress = document.getElementById("wallet-address");
+        const statusMessage = document.getElementById("status");
+        const mintButton = document.getElementById("mint-nft");
+
+        const contractAddress = "0x0631a4BB9eC05C6CdBbbC1A650824417074258bC";
+        const contractABI = [
+            "function mint()",
+            "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
+        ];
+    
+        async function connectWallet() {
+            try {
+                const accounts = await window.ethereum.request({
+                    method: "eth_requestAccounts"
+                });
+    
+                walletAddress.textContent = accounts[0];
+                mintButton.disabled = false;
+                statusMessage.textContent = "Wallet connected.";
+            } catch {
+                statusMessage.textContent = "Unable to connect. Please check MetaMask.";
+            }
+        }
+
+        async function mintNFT() {
+            mintButton.disabled = true;
+
+            try {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+                statusMessage.textContent = "Please confirm in MetaMask.";
+                const transaction = await contract.mint();
+
+                statusMessage.textContent = "Waiting for confirmation on the blockchain...";
+                const receipt = await transaction.wait();
+                const mintEvent = receipt.logs.find(log =>
+                    log.address.toLowerCase() === contractAddress.toLowerCase() &&
+                    log.eventName === "Transfer" && log.args.from === ethers.ZeroAddress
+                );
+
+                statusMessage.textContent = `NFT #${mintEvent.args.tokenId} minted successfully!`;
+            } catch (error) {
+                if (error.reason === "Only creator can mint") {
+                    statusMessage.textContent = "Wrong account. Only the deployer can mint.";
+                } else {
+                    statusMessage.textContent = "Mint failed or cancelled.";
+                }
+            } finally {
+                mintButton.disabled = false;
+            }
+        }
+    
+        connectButton.addEventListener("click", connectWallet);
+        mintButton.addEventListener("click", mintNFT);
+
+    </script>
+</body>
+</html>
