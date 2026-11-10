@@ -131,3 +131,15 @@ Base64 servira à encoder l’image et le JSON.
         fill="#fff9df">summer 42</text>
 
 </svg>
+
+---------------------------
+
+Bonus 
+Déroulement:
+1. Vérifier que le NFT existe.
+2. Construire le JSON : titre, artiste, description et adresse IPFS de l’image.
+3. Encoder ce JSON en Base64.
+4. Retourner le préfixe indiquant le format, suivi du contenu encodé.
+5. L’application décode la fiche, puis récupère l’image sur IPFS.
+
+->Mon contrat fournit directement les métadonnées du NFT. L’appli les décode pour les lire; l’image reste stockée sur IPFS.
