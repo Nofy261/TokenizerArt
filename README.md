@@ -6,15 +6,14 @@ TokenizerArt consiste à créer des NFT associés à une image contenant le nomb
 
 Un **NFT** (*Non-Fungible Token*, ou **jeton non fongible**) est un élément numérique identifié individuellement, dont le propriétaire et les transferts sont enregistrés sur une blockchain. Il peut être associé à une œuvre, comme une image.
 
-- **BNB Smart Chain Testnet** : je conserve un réseau que je connais déjà et j'utilise des tBNB de test, sans argent réel.
-- **Solidity** : j'utilise un langage adapté aux smart contracts de BSC.
+- **BNB Smart Chain Testnet** :réseau compatible avec les contrats Ethereum, permettant de déployer et tester un NFT avec Remix et MetaMask. Les frais sont payés en tBNB de test, sans argent réel.
+- **Solidity** : langage pris en charge par ce réseau, permettant de développer le contrat NFT et de réutiliser l’implémentation ERC-721 d’OpenZeppelin.
 - **OpenZeppelin (`ERC721URIStorage`)** : je m'appuie sur une implémentation standard ERC-721 pour gérer la propriété, les transferts et le lien des métadonnées de chaque NFT.
-- **Remix et MetaMask** : je conserve des outils déjà utilisés pour compiler, déployer et signer les transactions depuis le navigateur.
+- **Remix et MetaMask** : permettent de compiler, tester et déployer le contrat depuis le navigateur, sans installer d’environnement de développement local. MetaMask permet de signer les transactions.
 - **IPFS via Pinata** : je publie l'image et ses métadonnées avec un stockage distribué. Pinata conserve les fichiers et les partage sans nécessiter que mon ordinateur reste allumé.
 - **Mint réservé au déployeur** : je garde une règle d'accès simple, avec une adresse `creator` fixée au déploiement et aucun rôle administratif transférable.
 - **Plusieurs créations possibles** : je réutilise le même contrat et j'attribue un identifiant distinct à chaque nouveau NFT grâce à un compteur.
 - **NFT attribués au déployeur lors du mint** : je garde une fonction sans paramètre ; les NFT peuvent ensuite être transférés individuellement à d'autres comptes.
-- **Même image et mêmes métadonnées pour tous les NFT** : je conserve l'œuvre « summer 42 » pour me concentrer sur la création, la propriété et les transferts des tokens.
 
 ---
 
@@ -24,12 +23,11 @@ TokenizerArt consists of creating NFTs associated with an image featuring the nu
 
 An **NFT** (*Non-Fungible Token*) is an individually identified digital item whose owner and transfers are recorded on a blockchain. It can be associated with an artwork, such as an image.
 
-- **BNB Smart Chain Testnet**: I keep a network I already know and use test tBNB, without real money.
-- **Solidity**: I use a language suited to smart contracts on BSC.
+- **BNB Smart Chain Testnet**: a network compatible with Ethereum contracts, allowing NFTs to be deployed and tested with Remix and MetaMask. Fees are paid in test tBNB, without real money.
+- **Solidity**: a language supported by this network, allowing me to develop the NFT contract and reuse OpenZeppelin's ERC-721 implementation.
 - **OpenZeppelin (`ERC721URIStorage`)**: I rely on a standard ERC-721 implementation to manage ownership, transfers and each NFT's metadata link.
-- **Remix and MetaMask**: I keep familiar tools to compile, deploy and sign transactions from the browser.
+- **Remix and MetaMask**: these tools allow me to compile, test and deploy the contract from the browser without installing a local development environment. MetaMask allows me to sign transactions.
 - **IPFS through Pinata**: I publish the image and its metadata using distributed storage. Pinata stores and shares the files without requiring my computer to stay online.
 - **Minting restricted to the deployer**: I keep access control simple, with a `creator` address fixed at deployment and no transferable administrative role.
 - **Multiple mints allowed**: I reuse the same contract and assign a distinct identifier to each new NFT using a counter.
 - **NFTs assigned to the deployer when minted**: I keep a function with no parameters; NFTs can then be transferred individually to other accounts.
-- **Same image and metadata for all NFTs**: I keep the “summer 42” artwork to focus on token creation, ownership and transfers.
