@@ -148,6 +148,22 @@ Déroulement:
 
 CHECKLIST DES TESTS AVANT LA CORRECTION
 
+RAPPEL : RÉSEAU DU SITE DE MINT DANS METAMASK
+- Problème confirmé : le site utilisait Ethereum alors que la grande page
+  MetaMask affichait les jetons de BSC Testnet.
+- Le filtre de la liste des jetons ne garantit pas le réseau utilisé par le site.
+- Avant le mint : rester sur l'onglet localhost:8000/bonus/, cliquer sur
+  la pièce de puzzle de Firefox, puis MetaMask pour ouvrir la petite fenêtre.
+- Dans cette fenêtre, sélectionner BNB Smart Chain Testnet pour la connexion
+  utilisée par le site, comme lors de la manipulation réussie.
+- Dans la demande de transaction, vérifier aussi le réseau avant de confirmer.
+- Si la demande indique Ethereum ou réclame des ETH : annuler et vérifier
+  le réseau. Le contrat du projet est sur BSC Testnet ; ses frais utilisent des tBNB.
+- Ne pas acheter d'ETH pour résoudre ce problème.
+- La déconnexion ne signifie pas nécessairement que le réseau sera réinitialisé.
+- Choix actuel : vérification manuelle, sans ajout de code au site.
+  Le site ne bloque donc pas lui-même les appels sur un mauvais réseau.
+
 
 
 PRÉPARATION
@@ -162,8 +178,10 @@ PRÉPARATION
 - Pour chaque mint réussi, noter le contrat utilisé, le tokenId et le hash.
 - Ne pas supposer que le prochain tokenId est 1 : lire totalMinted() avant.
 
-[ ] 1. MINT NORMAL DEPUIS LE SITE
+[x] 1. MINT NORMAL DEPUIS LE SITE
 But : vérifier que le parcours normal fonctionne avant les autres tests.
+Test validé le 11 novembre 2026 sur BSC Testnet : le site annonce le mint
+réussi du NFT n° 4, totalMinted() retourne 4 et ownerOf(4) retourne account1.
 1. Sélectionner A dans MetaMask et BSC Testnet.
 2. Connecter le wallet au site et vérifier l'adresse affichée.
 3. Dans Remix, lire totalMinted() et noter cette valeur N.
@@ -199,8 +217,12 @@ Attendu : le site affiche B, ou demande clairement une reconnexion.
 Si le site affiche toujours A, son affichage n'a pas suivi le changement.
 Résultat observé :
 
-[ ] 4. MINT AVEC UN COMPTE NON AUTORISÉ
+[x] 4. MINT AVEC UN COMPTE NON AUTORISÉ
 But : vérifier que seul le créateur peut créer des NFT.
+Test validé le 11 novembre 2026 : compte2 connecté au site, message
+« Wrong account. Only the deployer can mint. », totalMinted() reste à 4.
+Rappel : sélectionner un compte dans MetaMask ne suffit pas ; il doit aussi
+être autorisé à se connecter à localhost:8000.
 1. Sur BSC Testnet, connecter B au site ; recharger si nécessaire.
 2. Vérifier que B est bien le compte utilisé pour l'appel.
 3. Lire totalMinted() dans Remix et noter N.
@@ -219,8 +241,11 @@ But : vérifier que la page réagit aussi à un changement en cours d'utilisatio
 Attendu : le site détecte le mauvais réseau et bloque le mint.
 Résultat observé :
 
-[ ] 6. TRANSACTION REFUSÉE PAR L'UTILISATRICE
+[x] 6. TRANSACTION REFUSÉE PAR L'UTILISATRICE
 But : vérifier que le site reste utilisable après une annulation.
+Test validé le 11 novembre 2026 selon le retour de l'utilisatrice : demande
+avec compte1 annulée dans MetaMask, message affiché sur le site, compteur
+inchangé à 4. Le site a ensuite permis de poursuivre les essais de mint.
 1. Revenir sur BSC Testnet et reconnecter A.
 2. Noter totalMinted(), puis cliquer sur Mint NFT.
 3. Refuser la demande dans MetaMask.
@@ -310,3 +335,6 @@ CAS À NE PAS CONFONDRE AVEC UN BUG DÉJÀ REPRODUIT
 - Tester volontairement un événement absent nécessite une simulation ciblée.
   Ne pas modifier le contrat déployé ni multiplier les mints pour provoquer ce cas.
 
+
+DAns le terminal pour decoder:
+python3 -c 'import base64; print(base64.b64decode("COLLER_LE_BASE64_ICI").decode())'

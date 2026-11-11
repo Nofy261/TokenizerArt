@@ -17,6 +17,13 @@
 
         <p id="wallet-address">No account connected.</p>
 
+        <p>
+            <label for="contract-address">Contract address</label>
+            <input id="contract-address" type="text" placeholder="0x..." autocomplete="off">
+        </p>
+        <button id="load-contract" type="button" disabled>Load contract</button>
+        <p id="loaded-contract">No contract loaded.</p>
+
         <button id="mint-nft" type="button" disabled>
             Mint NFT
         </button>
@@ -31,10 +38,15 @@
         const walletAddress = document.getElementById("wallet-address");
         const statusMessage = document.getElementById("status");
         const mintButton = document.getElementById("mint-nft");
+        const addressInput = document.getElementById("contract-address");
+        const loadButton = document.getElementById("load-contract");
+        const loadedContract = document.getElementById("loaded-contract");
 
-        const contractAddress = "0x0631a4BB9eC05C6CdBbbC1A650824417074258bC";
+        let contractAddress = null;
         const contractABI = [
             "function mint()",
+            "function creator() view returns (address)",
+            "function totalMinted() view returns (uint256)",
             "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
         ];
     
@@ -45,20 +57,69 @@
                 });
     
                 walletAddress.textContent = accounts[0];
-                mintButton.disabled = false;
+                loadButton.disabled = false;
+                mintButton.disabled = contractAddress === null;
                 statusMessage.textContent = "Wallet connected.";
             } catch {
                 statusMessage.textContent = "Unable to connect. Please check MetaMask.";
             }
         }
 
-        async function mintNFT() {
+        // Vérifier le réseau avant de lire ou modifier le contrat.
+        async function getTestnetProvider() {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const network = await provider.getNetwork();
+            if (network.chainId !== 97n) {
+                throw new Error("Please select BSC Testnet in MetaMask.");
+            }
+            return provider;
+        }
+
+        async function loadContract() {
+            contractAddress = null;
             mintButton.disabled = true;
+            loadButton.disabled = true;
+            loadedContract.textContent = "No contract loaded.";
 
             try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
+                const address = addressInput.value.trim();
+                if (!ethers.isAddress(address)) {
+                    throw new Error("Please enter a valid contract address.");
+                }
+                const provider = await getTestnetProvider();
+                if (await provider.getCode(address) === "0x") {
+                    throw new Error("No contract found at this address on BSC Testnet.");
+                }
+                // Ces lectures vérifient les fonctions attendues de nos contrats.
+                const contract = new ethers.Contract(address, contractABI, provider);
+                await contract.creator();
+                const total = await contract.totalMinted();
+
+                contractAddress = ethers.getAddress(address);
+                loadedContract.textContent = `Loaded: ${contractAddress} — ${total} minted`;
+                mintButton.disabled = false;
+                statusMessage.textContent = "Contract loaded. Ready to mint.";
+            } catch (error) {
+                statusMessage.textContent = error.shortMessage || error.message;
+            } finally {
+                loadButton.disabled = false;
+            }
+        }
+
+        async function mintNFT() {
+            mintButton.disabled = true;
+            loadButton.disabled = true;
+            connectButton.disabled = true;
+            const mintAddress = contractAddress;
+
+            try {
+                if (!mintAddress) {
+                    throw new Error("Please load a contract first.");
+                }
+                const provider = await getTestnetProvider();
                 const signer = await provider.getSigner();
-                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                walletAddress.textContent = await signer.getAddress();
+                const contract = new ethers.Contract(mintAddress, contractABI, signer);
 
                 statusMessage.textContent = "Please confirm in MetaMask.";
                 const transaction = await contract.mint();
@@ -66,23 +127,28 @@
                 statusMessage.textContent = "Waiting for confirmation on the blockchain...";
                 const receipt = await transaction.wait();
                 const mintEvent = receipt.logs.find(log =>
-                    log.address.toLowerCase() === contractAddress.toLowerCase() &&
+                    log.address.toLowerCase() === mintAddress.toLowerCase() &&
                     log.eventName === "Transfer" && log.args.from === ethers.ZeroAddress
                 );
 
-                statusMessage.textContent = `NFT #${mintEvent.args.tokenId} minted successfully!`;
+                statusMessage.textContent = mintEvent
+                    ? `NFT #${mintEvent.args.tokenId} minted successfully!`
+                    : `Transaction confirmed. Check the NFT in Remix. Hash: ${receipt.hash}`;
             } catch (error) {
                 if (error.reason === "Only creator can mint") {
                     statusMessage.textContent = "Wrong account. Only the deployer can mint.";
                 } else {
-                    statusMessage.textContent = "Mint failed or cancelled.";
+                    statusMessage.textContent = error.shortMessage || error.message || "Mint failed or cancelled.";
                 }
             } finally {
-                mintButton.disabled = false;
+                mintButton.disabled = contractAddress === null;
+                loadButton.disabled = false;
+                connectButton.disabled = false;
             }
         }
     
         connectButton.addEventListener("click", connectWallet);
+        loadButton.addEventListener("click", loadContract);
         mintButton.addEventListener("click", mintNFT);
 
     </script>
