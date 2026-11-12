@@ -38,7 +38,7 @@ Le résultat attendu est donc : un NFT associé à ton image, dont tu peux véri
 
 Déploiement → contrat présent, aucun NFT
 Appel à mint → création du NFT n° 1 pour mon adresse
-Nouvel appel à mint → refus, car ma limite serait de 1
+Nouvel appel à mint par le créateur → création du NFT n° 2, puis n° 3, etc.
 
 ordre :
 1. Créer ton image contenant 42 et choisir son titre.
@@ -71,7 +71,7 @@ nft.sol -> Le contrat :
 
 ------------------
 
-Ton contrat : une seule adresse
+Exemple de fonctionnement : un contrat possède une seule adresse
 ├── Premier appel à mint → NFT n° 1 → propriétaire : A
 ├── Deuxième appel à mint → NFT n° 2 → propriétaire : A
 └── Troisième appel à mint → NFT n° 3 → propriétaire : B, après un transfert
@@ -81,7 +81,7 @@ Adresse du contrat
 
 ---------------------------------
 
-Base64 servira à encoder l’image et le JSON.
+Dans le bonus actuel, Base64 sert à encoder l’image SVG et le JSON.
 
 <!-- Espace de dessin : 600 unités de large et de haut -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
@@ -134,26 +134,19 @@ Base64 servira à encoder l’image et le JSON.
 
 ---------------------------
 
-Bonus 
-Déroulement:
-1. Vérifier que le NFT existe.
-2. Construire le JSON : titre, artiste, description et adresse IPFS de l’image.
-3. Encoder ce JSON en Base64.
-4. Retourner le préfixe indiquant le format, suivi du contenu encodé.
-5. L’application décode la fiche, puis récupère l’image sur IPFS.
-
-->Mon contrat fournit directement les métadonnées du NFT. L’appli les décode pour les lire; l’image reste stockée sur IPFS.
-
--------------------
-
 CHECKLIST DES TESTS AVANT LA CORRECTION
+
+Cette liste sert à préparer les démonstrations et les essais de robustesse.
+Elle ne remplace pas la grille officielle de correction.
+[x] = fait ; [ ] = à vérifier en réel ; [~] = partiellement fait.
+Les résultats anciens concernent la mandatory sauf indication contraire.
 
 RAPPEL : RÉSEAU DU SITE DE MINT DANS METAMASK
 - Problème confirmé : le site utilisait Ethereum alors que la grande page
   MetaMask affichait les jetons de BSC Testnet.
 - Le filtre de la liste des jetons ne garantit pas le réseau utilisé par le site.
-- Avant le mint : rester sur l'onglet localhost:8000/bonus/, cliquer sur
-  la pièce de puzzle de Firefox, puis MetaMask pour ouvrir la petite fenêtre.
+- Avant le mint : rester sur l'onglet localhost:8000/bonus/ et cliquer sur
+  le renard orange dans la barre du navigateur pour ouvrir MetaMask.
 - Dans cette fenêtre, sélectionner BNB Smart Chain Testnet pour la connexion
   utilisée par le site, comme lors de la manipulation réussie.
 - Dans la demande de transaction, vérifier aussi le réseau avant de confirmer.
@@ -161,8 +154,8 @@ RAPPEL : RÉSEAU DU SITE DE MINT DANS METAMASK
   le réseau. Le contrat du projet est sur BSC Testnet ; ses frais utilisent des tBNB.
 - Ne pas acheter d'ETH pour résoudre ce problème.
 - La déconnexion ne signifie pas nécessairement que le réseau sera réinitialisé.
-- Choix actuel : vérification manuelle, sans ajout de code au site.
-  Le site ne bloque donc pas lui-même les appels sur un mauvais réseau.
+- Le site vérifie maintenant BSC Testnet avant de charger un contrat et avant
+  d'appeler mint(). Un autre réseau provoque un message d'erreur.
 
 
 
@@ -173,6 +166,9 @@ PRÉPARATION
 - Contrat mandatory existant :
   0x0631a4BB9eC05C6CdBbbC1A650824417074258bC
 - Dans Remix, sélectionner Summer42NFT et charger cette adresse avec At Address.
+- Pour le bonus SVG, sélectionner Summer42OnChain et utiliser l'adresse :
+  0x08A1107F8cFBB6F6521328797053950FF1D8F6a2.
+- Dans le site, saisir l'adresse choisie puis cliquer sur Load contract.
 - Ouvrir le site bonus avec sa méthode habituelle de lancement.
 - Garder Remix et MetaMask ouverts pour vérifier les résultats du site.
 - Pour chaque mint réussi, noter le contrat utilisé, le tokenId et le hash.
@@ -192,19 +188,13 @@ réussi du NFT n° 4, totalMinted() retourne 4 et ownerOf(4) retourne account1.
 Attendu : le site annonce le succès et le nouveau NFT appartient à A.
 Si le site annonce un échec mais que le compteur a augmenté et que le NFT
 existe, le problème concerne l'affichage du résultat, pas la création.
-Résultat observé :
 
-[ ] 2. CONNEXION SUR UN MAUVAIS RÉSEAU
-But : vérifier si le site bloque le mint hors de BSC Testnet.
-1. Recharger le site pour repartir d'une nouvelle connexion.
-2. Sélectionner un autre réseau DE TEST dans MetaMask, puis connecter A.
-3. Observer le message et l'état du bouton Mint NFT.
-4. Si le bouton est actif, cliquer pour observer la réaction.
-5. ANNULER toute demande de transaction : ne rien envoyer sur ce réseau.
-Attendu : le site explique que BSC Testnet est requis et bloque le mint.
-Un bouton actif confirme l'absence de blocage préalable ; cela ne prouve
-pas qu'une transaction aurait réussi sur ce réseau.
-Résultat observé :
+[x] 2. CHARGEMENT SUR UN MAUVAIS RÉSEAU
+But : vérifier que le site refuse de charger un contrat hors de BSC Testnet.
+Résultat observé le 12 novembre 2026 : le site affichait
+« Please select BSC Testnet in MetaMask. » et ne chargeait pas le contrat.
+La connexion du site utilisait Ethereum, malgré le filtre BSC dans le wallet.
+Après sélection de BSC Testnet dans la connexion du site, le chargement a réussi.
 
 [ ] 3. CHANGEMENT DE COMPTE SANS RECHARGER LE SITE
 But : vérifier que le site affiche bien le compte actuellement connecté.
@@ -215,7 +205,8 @@ But : vérifier que le site affiche bien le compte actuellement connecté.
 4. Comparer l'adresse du site et celle du compte B.
 Attendu : le site affiche B, ou demande clairement une reconnexion.
 Si le site affiche toujours A, son affichage n'a pas suivi le changement.
-Résultat observé :
+État : pas validé en réel. Le code actuel ne réagit pas automatiquement au
+changement de compte ; l'adresse est actualisée à la reconnexion ou au mint.
 
 [x] 4. MINT AVEC UN COMPTE NON AUTORISÉ
 But : vérifier que seul le créateur peut créer des NFT.
@@ -230,16 +221,15 @@ Rappel : sélectionner un compte dans MetaMask ne suffit pas ; il doit aussi
 5. Si MetaMask signale déjà que la transaction échouera, ne pas forcer l'envoi.
 6. Relire totalMinted() dans Remix.
 Attendu : refus, idéalement expliqué par Only creator can mint ; compteur N.
-Résultat observé :
 
 [ ] 5. CHANGEMENT DE RÉSEAU APRÈS CONNEXION
-But : vérifier que la page réagit aussi à un changement en cours d'utilisation.
+But : vérifier que le réseau est contrôlé de nouveau avant une opération.
 1. Connecter A au site sur BSC Testnet.
-2. Passer sur un autre réseau de test dans MetaMask, sans recharger la page.
-3. Observer le message et le bouton Mint NFT.
-4. Si nécessaire, cliquer pour observer, mais annuler toute transaction.
-Attendu : le site détecte le mauvais réseau et bloque le mint.
-Résultat observé :
+2. Charger le contrat avec Load contract.
+3. Passer sur un autre réseau de test dans MetaMask, sans recharger la page.
+4. Cliquer sur Mint NFT : le contrôle du réseau doit refuser l'appel au contrat.
+Attendu : message demandant BSC Testnet, aucune transaction de mint envoyée.
+État : réussi en simulation locale ; pas encore confirmé avec MetaMask.
 
 [x] 6. TRANSACTION REFUSÉE PAR L'UTILISATRICE
 But : vérifier que le site reste utilisable après une annulation.
@@ -250,10 +240,11 @@ inchangé à 4. Le site a ensuite permis de poursuivre les essais de mint.
 2. Noter totalMinted(), puis cliquer sur Mint NFT.
 3. Refuser la demande dans MetaMask.
 Attendu : message compréhensible, compteur inchangé, bouton réutilisable.
-Résultat observé :
 
-[ ] 7. NOUVEAU DÉPLOIEMENT ET MINT PENDANT LA CORRECTION
+[~] 7. NOUVEAU DÉPLOIEMENT ET MINT PENDANT LA CORRECTION
 But : vérifier que je sais refaire le projet, pas seulement utiliser l'ancien contrat.
+État : déploiement et mint du nouveau bonus SVG réalisés le 12 novembre 2026.
+La répétition suivante, spécifique à code/nft.sol, reste à confirmer.
 1. Compiler code/nft.sol et noter la version du compilateur et ses réglages.
 2. Depuis A, déployer Summer42NFT sur BSC Testnet avec Value à 0.
 3. Noter la NOUVELLE adresse du contrat.
@@ -261,23 +252,25 @@ But : vérifier que je sais refaire le projet, pas seulement utiliser l'ancien c
 5. Appeler mint(), puis vérifier totalMinted() = 1 et ownerOf(1) = A.
 6. Appeler tokenURI(1) et vérifier le lien des métadonnées.
 Attendu : le nouveau contrat permet de créer un NFT indépendamment de l'ancien.
-Attention : le site utilise encore l'adresse de l'ancien contrat.
-Pour tester le site avec le nouveau, il faut y remplacer contractAddress.
+Pour tester le site avec cette nouvelle instance, saisir sa nouvelle adresse
+dans Contract address puis cliquer sur Load contract.
 Ne pas confondre les compteurs et les tokenId des deux contrats.
-Résultat observé :
 
-[ ] 8. MÉTADONNÉES ET IMAGE DE LA MANDATORY
+[x] 8. MÉTADONNÉES ET IMAGE DE LA MANDATORY
 But : vérifier toute la chaîne contrat → fiche → image.
+Résultat déjà confirmé lors des essais précédents : JSON et image IPFS ouverts
+avec succès, artiste nolecler et titre summer 42.
 1. Choisir un tokenId existant et appeler tokenURI(tokenId) dans Remix.
 2. Ouvrir le lien IPFS via https://dweb.link/ipfs/CID (remplacer CID).
 3. Vérifier le JSON : artist = nolecler ; name contient 42 et un titre.
 4. Ouvrir de la même façon le lien du champ image.
 Attendu : le paysage s'affiche et le nombre 42 est lisible.
 Ce test ne remplace pas le test d'affichage dans un wallet ou une marketplace.
-Résultat observé :
 
-[ ] 9. PROPRIÉTÉ ET TRANSFERT
+[x] 9. PROPRIÉTÉ ET TRANSFERT
 But : vérifier que le propriétaire change sans créer un autre NFT.
+Résultat déjà confirmé sur la mandatory : account1 a transféré le NFT 1 à
+account2 ; chacun avait alors un NFT et totalMinted() était resté à 2.
 1. Choisir un NFT appartenant actuellement à A et noter son tokenId.
 2. Vérifier ownerOf(tokenId) = A et noter totalMinted().
 3. Depuis A, appeler safeTransferFrom(A, B, tokenId), version à 3 paramètres.
@@ -285,56 +278,148 @@ But : vérifier que le propriétaire change sans créer un autre NFT.
 5. Vérifier ownerOf(tokenId) = B.
 Attendu : totalMinted() reste inchangé et le tokenId est conservé.
 Garder au moins un autre NFT sur A pour la démonstration de propriété.
-Résultat observé :
 
-[ ] 10. TRANSFERT SANS AUTORISATION
+[x] 10. TRANSFERT SANS AUTORISATION
 But : vérifier que l'ancien propriétaire ne peut plus transférer le NFT.
+Résultat déjà confirmé sur la mandatory : l'estimation du transfert par account1
+a été refusée avec ERC721InsufficientApproval ; le NFT est resté à account2.
 1. Utiliser le NFT transféré à B au test 9.
 2. Sans autorisation accordée par B, depuis A, essayer
    safeTransferFrom(B, A, tokenId).
 3. Ne pas forcer l'envoi si l'estimation annonce un échec.
 Attendu : refus ; ownerOf(tokenId) reste B.
-Résultat observé :
 
-[ ] 11. CONTRAT BONUS : FICHE JSON INTÉGRÉE
-But : vérifier la version bonus actuelle, avec métadonnées on-chain et image IPFS.
-1. Compiler bonus/nftOnChain.sol.
-2. Déployer Summer42OnChain dans Remix VM pour un premier essai local.
-3. Avant tout mint, appeler tokenURI(1) : attendu refus, NFT inexistant.
-4. Depuis le compte de déploiement, appeler mint().
-5. Vérifier totalMinted() = 1 et ownerOf(1) = compte de déploiement.
-6. Appeler tokenURI(1) et copier la chaîne retournée, sans les annotations Remix.
-7. Vérifier qu'elle commence par data:application/json;base64,.
-8. Avec un décodeur Base64, décoder UNIQUEMENT la partie après la virgule.
-9. Vérifier le JSON obtenu : titre, artiste, description et champ image.
-10. Ouvrir le lien IPFS de l'image via dweb.link et vérifier son affichage.
-11. Changer de compte dans Remix VM et essayer mint() : attendu refus.
-12. Après validation locale, déployer sur BSC Testnet, noter la nouvelle adresse,
-    mint et refaire les vérifications de propriété et de fiche.
-Limitation connue : l'image reste sur IPFS. Ce test ne valide donc pas
-le critère strict « métadonnées ET images directement sur la blockchain ».
-Résultat observé :
+[~] 11. CONTRAT BONUS : JSON ET SVG INTÉGRÉS
+But : vérifier les métadonnées ET l'image fournies directement par le contrat.
+Fait le 12 novembre 2026 : déploiement sur BSC Testnet, mint depuis le site,
+récupération de tokenURI(), décodage du JSON et affichage du SVG intégré.
+L'image retournée correspond au SVG contenu dans bonus/nftOnChain.sol.
 
-[ ] 12. AFFICHAGE EXIGÉ PAR LA GRILLE
+Pour refaire la lecture :
+1. Charger le nouveau contrat bonus dans Remix et choisir un NFT existant.
+2. Appeler tokenURI(tokenId), qui renvoie data:application/json;base64,...
+3. Décoder la partie après la virgule pour lire name, artist, description et image.
+4. Ouvrir la valeur du champ image, commençant par data:image/svg+xml;base64,...
+   dans le navigateur, selon la méthode expliquée plus bas.
+
+Refus restant à vérifier spécifiquement sur cette nouvelle instance :
+- tokenURI() avec un identifiant inexistant doit être refusé.
+- mint() depuis un compte différent du créateur doit être refusé,
+  sans augmentation de totalMinted().
+
+[x] 12. AFFICHAGE EXIGÉ PAR LA GRILLE
 But : montrer le NFT dans un wallet ou une marketplace compatible.
 1. Choisir un NFT et vérifier son propriétaire actuel avec ownerOf(tokenId).
 2. Dans le wallet, sélectionner le même compte et BSC Testnet.
 3. Importer le NFT avec l'adresse de son contrat et son tokenId.
 4. Vérifier que le NFT est identifiable ET que son image avec 42 s'affiche.
 Attendu : affichage dans le wallet, ou dans une marketplace compatible BSC Testnet.
-État déjà constaté : MetaMask importe le NFT n° 2 mais n'affiche pas son image.
-Les fichiers JSON et image ont été ouverts via dweb.link avec succès.
-La cause de l'échec MetaMask reste inconnue ; ne pas modifier le contrat au hasard.
-Ouvrir seulement l'image sur IPFS ne valide pas à lui seul cette case.
-Résultat observé :
-
-CAS À NE PAS CONFONDRE AVEC UN BUG DÉJÀ REPRODUIT
-- Le site lit mintEvent.args sans vérifier que mintEvent a été trouvé.
-- Le test 1 peut révéler un faux message d'échec après une transaction réussie.
-- Si le test 1 réussit, cela ne prouve pas que ce cas particulier est géré.
-- Tester volontairement un événement absent nécessite une simulation ciblée.
-  Ne pas modifier le contrat déployé ni multiplier les mints pour provoquer ce cas.
+Résultat observé le 12 novembre 2026 : la capture MetaMask montre account1,
+BNB Smart Chain Testnet et l'image du paysage SVG avec le texte summer 42.
+L'adresse et le tokenId ne sont pas visibles sur cette capture ; les vérifier
+dans la fiche du NFT pour bien identifier le contrat présenté.
 
 
 DAns le terminal pour decoder:
 python3 -c 'import base64; print(base64.b64decode("COLLER_LE_BASE64_ICI").decode())'
+
+
+-------------------
+12 NOVEMBRE 2026 — BONUS AVEC IMAGE SVG INTÉGRÉE
+
+Repères pour ne pas confondre les contrats :
+
+1. MANDATORY — Summer42NFT
+   Source : code/nft.sol.
+   BSC Testnet : 0x0631a4BB9eC05C6CdBbbC1A650824417074258bC.
+   Métadonnées ET image sur IPFS.
+
+2. ANCIEN CONTRAT BONUS — Summer42OnChain, conservé comme repère historique
+   BSC Testnet : 0xb32924c0476151Db5684998D5b3097f5f32FA7FD.
+   Déploiement renseigné le 11 novembre 2026.
+   Métadonnées fournies par le contrat en Base64, image encore sur IPFS.
+   Cette instance garde son ancien fonctionnement même si je modifie le fichier.
+
+3. CONTRAT BONUS ACTUEL AVEC SVG — Summer42OnChain
+   Source modifiée : bonus/nftOnChain.sol.
+   Nouvelle adresse communiquée après déploiement le 12 novembre 2026 :
+   0x08A1107F8cFBB6F6521328797053950FF1D8F6a2.
+   Déploiement via Remix avec confirmation MetaMask, pas dans Remix VM.
+   Connexion au site sur BSC Testnet rétablie selon le retour de l'utilisatrice.
+   Le dessin de bonus/summer42.svg est maintenant intégré au code du contrat.
+   tokenURI() fournit le JSON en Base64, avec l'image SVG elle aussi en Base64.
+   Objectif : fournir les métadonnées ET l'image directement depuis la blockchain.
+   Les règles de mint restent identiques : seul le déployeur peut créer les NFT.
+   Le fond PNG du site reste un décor séparé.
+
+État de l'essai :
+- Structure du SVG et des données JSON vérifiée localement.
+- totalMinted() valait 0 avant l'essai de mint, selon le retour de l'utilisatrice.
+- Le résultat de tokenURI() a été fourni et décodé : JSON valide, artist = nolecler,
+  name = summer 42 et champ image contenant data:image/svg+xml;base64,...
+- Le SVG retourné correspond au dessin intégré dans le contrat.
+- Affichage de l'image confirmé par l'utilisatrice le 12 novembre 2026.
+- Capture MetaMask reçue le même jour : dans l'onglet NFT, account1 et le filtre
+  BNB Smart Chain Testnet sont visibles ; la vignette affiche le paysage SVG
+  et le texte summer 42. Le critère visuel dans un wallet est donc démontré
+  pour ce NFT affiché. L'adresse et le tokenId ne sont pas visibles sur la capture ;
+  ouvrir sa fiche pour confirmer qu'il s'agit du nouveau contrat et du NFT 1.
+- L'ouverture du SVG à partir de tokenURI() et son affichage dans MetaMask
+  sont validés. Le guide de déploiement et la documentation décrivent cette version.
+- Chaque nouvelle instance démarre avec totalMinted() = 0 ; premier NFT = 1.
+
+COMPRENDRE tokenURI() ET LES DEUX DÉCODAGES
+
+J'appelle tokenURI(tokenId) depuis le contrat chargé dans Remix, en indiquant
+le numéro d'un NFT existant. C'est une lecture : aucune transaction à confirmer
+dans MetaMask et aucun frais de gas à payer pour cet appel de lecture.
+MetaMask sert notamment à signer et confirmer le déploiement et le mint.
+
+Dans cette nouvelle version, le code déployé contient le dessin SVG et les
+informations descriptives. tokenURI() les assemble et renvoie une seule chaîne :
+
+data:application/json;base64,JSON_ENCODE
+
+Premier décodage :
+- Je prends uniquement la partie après la première virgule et je la décode
+  en Base64 dans le terminal.
+- J'obtiens le JSON avec name, artist, description et image.
+- Le champ image contient lui-même : data:image/svg+xml;base64,SVG_ENCODE.
+
+Deuxième décodage :
+- La partie après la virgule du champ image représente le texte du dessin SVG.
+- Le navigateur peut effectuer ce décodage et afficher le dessin directement
+  lorsque j'ouvre la valeur complète du champ image avec son préfixe data:.
+
+Schéma :
+tokenURI(tokenId)
+  -> JSON encodé en Base64
+  -> décodage : métadonnées contenant le champ image
+  -> image SVG encodée en Base64 dans ce champ
+  -> décodage par le navigateur : dessin affiché
+
+Les métadonnées ET l'image proviennent donc du contrat, sans récupérer
+de fichier sur IPFS. Le PNG en fond du site n'est pas l'image de ce NFT.
+
+Pour ouvrir l'image :
+- Dans la barre d'adresse du navigateur, taper manuellement :
+  data:image/svg+xml;base64,
+- Coller immédiatement après la partie Base64 commençant par PHN2Zy,
+  sans espace ni guillemets, puis appuyer sur Entrée.
+- Un collage interprété comme une recherche affichait une réponse d'IA avec
+  des erreurs supposées. Les données vérifiées n'avaient pas ces anomalies.
+- Pour ouvrir l'extension MetaMask depuis le site, cliquer sur le renard orange
+  dans la barre du navigateur ; l'icône puzzle ouvre le menu des extensions.
+
+
+LANCER LE SITE DE MINT EN LOCAL
+Dans le terminal, me placer à la racine du projet puis lancer le serveur :
+
+cd /Users/administrateur/Desktop/TokenizerArt
+python3 -m http.server 8000 --bind 127.0.0.1
+
+Ouvrir dans le navigateur où MetaMask est installé :
+http://localhost:8000/bonus/
+
+Ce serveur fournit les fichiers du site depuis mon ordinateur.
+Garder le terminal ouvert pendant le test ; Ctrl + C pour arrêter le serveur.

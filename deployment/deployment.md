@@ -41,17 +41,19 @@ Le déploiement installe le programme sur la blockchain. La création des NFT se
 
 [Consulter le contrat sur BscScan Testnet](https://testnet.bscscan.com/address/0x0631a4BB9eC05C6CdBbbC1A650824417074258bC).
 
-## Contrat bonus déjà déployé
+## Contrat bonus SVG déjà déployé
 
 - **Contrat :** `Summer42OnChain` — [source](../bonus/nftOnChain.sol).
 - **Réseau :** BNB Smart Chain Testnet — Chain ID `97`.
-- **Adresse :** `0xb32924c0476151Db5684998D5b3097f5f32FA7FD`.
+- **Adresse :** `0x08A1107F8cFBB6F6521328797053950FF1D8F6a2`.
 - **Déployeur :** `0x30E60e59368fe5bFB6AED7431980ed6366543b4d`.
-- **Déploiement :** 11 novembre 2026.
+- **Déploiement :** 12 novembre 2026.
 
-Cette instance fournit les métadonnées directement via `tokenURI()` ; l'image reste sur IPFS. Elle est distincte du contrat mandatory et possède son propre compteur et ses propres NFT. Pour la redéployer, suivre les étapes ci-dessus avec le fichier bonus et sélectionner `Summer42OnChain`.
+Cette instance fournit les métadonnées JSON et l'image SVG directement depuis le contrat via `tokenURI()`, encodées en Base64, sans fichier sur IPFS. Elle est distincte du contrat mandatory et possède son propre compteur et ses propres NFT.
 
-[Consulter le contrat bonus sur BscScan Testnet](https://testnet.bscscan.com/address/0xb32924c0476151Db5684998D5b3097f5f32FA7FD).
+Pour la redéployer, suivre les étapes ci-dessus avec `bonus/nftOnChain.sol` et sélectionner `Summer42OnChain`. Le constructeur ne demande aucun argument. Charger la nouvelle adresse dans le site pour utiliser cette nouvelle instance.
+
+[Consulter le contrat bonus sur BscScan Testnet](https://testnet.bscscan.com/address/0x08A1107F8cFBB6F6521328797053950FF1D8F6a2).
 
 ---
 
@@ -98,14 +100,16 @@ Deployment installs the program on the blockchain. NFTs are then created through
 
 [View the contract on BscScan Testnet](https://testnet.bscscan.com/address/0x0631a4BB9eC05C6CdBbbC1A650824417074258bC).
 
-## Existing bonus deployment
+## Existing SVG bonus deployment
 
 - **Contract:** `Summer42OnChain` — [source](../bonus/nftOnChain.sol).
 - **Network:** BNB Smart Chain Testnet — Chain ID `97`.
-- **Address:** `0xb32924c0476151Db5684998D5b3097f5f32FA7FD`.
+- **Address:** `0x08A1107F8cFBB6F6521328797053950FF1D8F6a2`.
 - **Deployer:** `0x30E60e59368fe5bFB6AED7431980ed6366543b4d`.
-- **Deployment date:** November 11, 2026.
+- **Deployment date:** November 12, 2026.
 
-This instance provides metadata directly through `tokenURI()`; the image remains on IPFS. It is separate from the mandatory contract and has its own counter and NFTs. To redeploy it, follow the steps above using the bonus file and select `Summer42OnChain`.
+This instance provides JSON metadata and the SVG image directly from the contract through `tokenURI()`, encoded in Base64, without any IPFS file. It is separate from the mandatory contract and has its own counter and NFTs.
 
-[View the bonus contract on BscScan Testnet](https://testnet.bscscan.com/address/0xb32924c0476151Db5684998D5b3097f5f32FA7FD).
+To redeploy it, follow the steps above using `bonus/nftOnChain.sol` and select `Summer42OnChain`. The constructor takes no arguments. Load the new address in the website to use this new instance.
+
+[View the bonus contract on BscScan Testnet](https://testnet.bscscan.com/address/0x08A1107F8cFBB6F6521328797053950FF1D8F6a2).
