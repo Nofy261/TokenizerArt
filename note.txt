@@ -423,3 +423,32 @@ http://localhost:8000/bonus/
 
 Ce serveur fournit les fichiers du site depuis mon ordinateur.
 Garder le terminal ouvert pendant le test ; Ctrl + C pour arrêter le serveur.
+
+
+----------------------
+Correction:
+
+Montrer l'image du NFT dans le wallet:
+-> dans metamask , importer des nft , ajouter l'adresse du bonus et 1
+
+Mon NFT est associé à uen fiche descriptive qui contient des infos de l'oeuvre et l elien vers son image.
+Montrer la métadonnée du NFT:
+-> Dans remix , contrat du mandat deployé Puis 
+-> tokenURI(1) -> dans le navigateur copier le lien ipfs en commençant par
+https://dweb.link/ipfs/LIEN_A_COPIER_ICI 
+-> Pareil pour montrer l'image du NFT
+
+J’ai choisi BNB Smart Chain Testnet parce qu’il peut exécuter mon contrat écrit en Solidity et fonctionne avec Remix et MetaMask.
+Je peux développer et tester mon NFT sans utiliser d’argent réel.
+
+- Expliquer brievement la structure du projet
+
+Code review manda:
+->Mon contrat hérite d’ERC721URIStorage, qui étend ERC721. Il fournit la gestion des NFT et l’enregistrement d’une URI de métadonnées pour chaque token.
+->Le constructeur initialise le nom et le symbole de la collection, puis mémorise le déployeur dans creator
+->on calcule l’identifiant, on met le compteur à jour, puis _safeMint(creator, tokenId) crée le NFT.
+->Enfin, _setTokenURI() lui associe le lien vers sa fiche, qui contient le lien de l’image.
+
+_safeMint() crée le NFT et enregistre mon compte comme son premier propriétaire.
+_setTokenURI() relie le NFT créé à sa fiche de métadonnées sur IPFS
+
