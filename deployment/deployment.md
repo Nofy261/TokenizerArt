@@ -55,6 +55,8 @@ Pour la redéployer, suivre les étapes ci-dessus avec `bonus/nftOnChain.sol` et
 
 [Consulter le contrat bonus sur BscScan Testnet](https://testnet.bscscan.com/address/0x08A1107F8cFBB6F6521328797053950FF1D8F6a2).
 
+Ouvrir le site local:
+python3 -m http.server 8000 --bind 127.0.0.1
 
 Décoder les données:
 python3 -c 'import base64; print(base64.b64decode("COLLER_LE_BASE64_ICI").decode())'

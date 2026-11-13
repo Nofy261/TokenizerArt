@@ -352,28 +352,11 @@ Repères pour ne pas confondre les contrats :
    Les règles de mint restent identiques : seul le déployeur peut créer les NFT.
    Le fond PNG du site reste un décor séparé.
 
-État de l'essai :
-- Structure du SVG et des données JSON vérifiée localement.
-- totalMinted() valait 0 avant l'essai de mint, selon le retour de l'utilisatrice.
-- Le résultat de tokenURI() a été fourni et décodé : JSON valide, artist = nolecler,
-  name = summer 42 et champ image contenant data:image/svg+xml;base64,...
-- Le SVG retourné correspond au dessin intégré dans le contrat.
-- Affichage de l'image confirmé par l'utilisatrice le 12 novembre 2026.
-- Capture MetaMask reçue le même jour : dans l'onglet NFT, account1 et le filtre
-  BNB Smart Chain Testnet sont visibles ; la vignette affiche le paysage SVG
-  et le texte summer 42. Le critère visuel dans un wallet est donc démontré
-  pour ce NFT affiché. L'adresse et le tokenId ne sont pas visibles sur la capture ;
-  ouvrir sa fiche pour confirmer qu'il s'agit du nouveau contrat et du NFT 1.
-- L'ouverture du SVG à partir de tokenURI() et son affichage dans MetaMask
-  sont validés. Le guide de déploiement et la documentation décrivent cette version.
-- Chaque nouvelle instance démarre avec totalMinted() = 0 ; premier NFT = 1.
 
 COMPRENDRE tokenURI() ET LES DEUX DÉCODAGES
 
 J'appelle tokenURI(tokenId) depuis le contrat chargé dans Remix, en indiquant
-le numéro d'un NFT existant. C'est une lecture : aucune transaction à confirmer
-dans MetaMask et aucun frais de gas à payer pour cet appel de lecture.
-MetaMask sert notamment à signer et confirmer le déploiement et le mint.
+le numéro d'un NFT existant.
 
 Dans cette nouvelle version, le code déployé contient le dessin SVG et les
 informations descriptives. tokenURI() les assemble et renvoie une seule chaîne :
@@ -415,7 +398,7 @@ Pour ouvrir l'image :
 LANCER LE SITE DE MINT EN LOCAL
 Dans le terminal, me placer à la racine du projet puis lancer le serveur :
 
-cd /Users/administrateur/Desktop/TokenizerArt
+cd TokenizerArt
 python3 -m http.server 8000 --bind 127.0.0.1
 
 Ouvrir dans le navigateur où MetaMask est installé :
@@ -438,8 +421,11 @@ Montrer la métadonnée du NFT:
 https://dweb.link/ipfs/LIEN_A_COPIER_ICI 
 -> Pareil pour montrer l'image du NFT
 
-J’ai choisi BNB Smart Chain Testnet parce qu’il peut exécuter mon contrat écrit en Solidity et fonctionne avec Remix et MetaMask.
-Je peux développer et tester mon NFT sans utiliser d’argent réel.
+J’ai choisi BNB Smart Chain Testnet parce qu’il est compatible avec Solidity, Remix et MetaMask.
+Il permet de déployer et tester mon contrat avec des tBNB de test, sans dépenser d’argent réel.
+
+J’ai choisi Solidity, un langage conçu pour écrire des smart contracts. BNB Smart Chain est compatible avec l’EVM, qui exécute le code compilé depuis Solidity.
+La blockchain exécute donc le code compilé, plutôt que le fichier Solidity directement.
 
 - Expliquer brievement la structure du projet
 

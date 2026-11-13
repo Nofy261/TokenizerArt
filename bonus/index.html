@@ -90,7 +90,7 @@
                 if (await provider.getCode(address) === "0x") {
                     throw new Error("No contract found at this address on BSC Testnet.");
                 }
-                // Ces lectures vérifient les fonctions attendues de nos contrats.
+                // Ces lectures vérifient les fonctions attendues des contrats.
                 const contract = new ethers.Contract(address, contractABI, provider);
                 await contract.creator();
                 const total = await contract.totalMinted();
