@@ -50,6 +50,7 @@
             "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
         ];
     
+        // Je connecte le site à MetaMask et j'affiche l'adresse du compte autorisé
         async function connectWallet() {
             try {
                 const accounts = await window.ethereum.request({
@@ -65,7 +66,7 @@
             }
         }
 
-        // Vérifier le réseau avant de lire ou modifier le contrat.
+        // Vérifier le réseau avant de lire ou modifier le contrat
         async function getTestnetProvider() {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const network = await provider.getNetwork();
@@ -75,6 +76,7 @@
             return provider;
         }
 
+        // Je charge le contrat choisi et je vérifie qu'il répond sur BSC Testnet.
         async function loadContract() {
             contractAddress = null;
             mintButton.disabled = true;
@@ -90,7 +92,7 @@
                 if (await provider.getCode(address) === "0x") {
                     throw new Error("No contract found at this address on BSC Testnet.");
                 }
-                // Ces lectures vérifient les fonctions attendues des contrats.
+                // Ces lectures vérifient les fonctions attendues des contrats
                 const contract = new ethers.Contract(address, contractABI, provider);
                 await contract.creator();
                 const total = await contract.totalMinted();
@@ -106,41 +108,55 @@
             }
         }
 
+        // Je demande le mint via MetaMask, puis j'attends la confirmation et j'affiche le numéro du NFT créé
         async function mintNFT() {
+            // Je désactive les boutons pendant l'opération et je garde l'adresse du contrat choisi.
             mintButton.disabled = true;
             loadButton.disabled = true;
             connectButton.disabled = true;
             const mintAddress = contractAddress;
 
             try {
+                // Je vérifie qu'un contrat est chargé et que MetaMask utilise BSC Testnet.
                 if (!mintAddress) {
                     throw new Error("Please load a contract first.");
                 }
                 const provider = await getTestnetProvider();
+
+                // Je récupère le compte MetaMask actif et j'affiche son adresse.
                 const signer = await provider.getSigner();
                 walletAddress.textContent = await signer.getAddress();
+
+                // Je prépare les appels au contrat avec ce compte grâce à son adresse et à l'ABI.
                 const contract = new ethers.Contract(mintAddress, contractABI, signer);
 
+                // Je demande le mint, que l'utilisateur doit confirmer dans MetaMask.
                 statusMessage.textContent = "Please confirm in MetaMask.";
                 const transaction = await contract.mint();
 
+                // J'attends la confirmation de la transaction sur la blockchain.
                 statusMessage.textContent = "Waiting for confirmation on the blockchain...";
                 const receipt = await transaction.wait();
+
+                // Je cherche l'événement de création, dont l'adresse de départ est l'adresse zéro.
                 const mintEvent = receipt.logs.find(log =>
                     log.address.toLowerCase() === mintAddress.toLowerCase() &&
                     log.eventName === "Transfer" && log.args.from === ethers.ZeroAddress
                 );
 
+                // J'affiche le numéro du NFT créé ou le hash de la transaction si l'événement manque.
                 statusMessage.textContent = mintEvent
                     ? `NFT #${mintEvent.args.tokenId} minted successfully!`
                     : `Transaction confirmed. Check the NFT in Remix. Hash: ${receipt.hash}`;
             } catch (error) {
+                // J'affiche l'erreur si le compte est non autorisé ou si le mint échoue ou est annulé.
                 if (error.reason === "Only creator can mint") {
                     statusMessage.textContent = "Wrong account. Only the deployer can mint.";
                 } else {
                     statusMessage.textContent = error.shortMessage || error.message || "Mint failed or cancelled.";
                 }
             } finally {
+                // Je remets les boutons à disposition, que l'opération ait réussi ou échoué.
                 mintButton.disabled = contractAddress === null;
                 loadButton.disabled = false;
                 connectButton.disabled = false;

@@ -12,6 +12,8 @@ Utiliser Remix et MetaMask sur **BSC Testnet** (Chain ID `97`), avec le compte `
    0x0631a4BB9eC05C6CdBbbC1A650824417074258bC
    ```
 
+   Après un nouveau déploiement, utiliser la nouvelle adresse à la place de celle de cet exemple.
+
 2. Consulter `creator()` et sélectionner cette adresse dans MetaMask et Remix.
 3. Lire `totalMinted()` avant l'appel et noter sa valeur `N`. Le prochain NFT aura l'identifiant `N + 1`.
 4. Appeler **`mint()`**, sans argument, avec **Value à 0**, puis confirmer la transaction dans MetaMask.
@@ -42,6 +44,8 @@ Use Remix and MetaMask on **BSC Testnet** (Chain ID `97`), with the `creator` ac
    ```text
    0x0631a4BB9eC05C6CdBbbC1A650824417074258bC
    ```
+
+   After a new deployment, use the new address instead of the one in this example.
 
 2. Read `creator()` and select that address in MetaMask and Remix.
 3. Read `totalMinted()` before the call and record its value as `N`. The next NFT will have identifier `N + 1`.
