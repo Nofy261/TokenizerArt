@@ -1,8 +1,8 @@
-# TokenizerArt
+# TokenizeArt
 
 ## Version française
 
-TokenizerArt consiste à créer des NFT associés à une image contenant le nombre 42. Je prépare l'image et ses métadonnées sur IPFS, puis j'utilise un smart contract déployé sur BSC Testnet pour créer les NFT, consulter leurs propriétaires et les transférer. L'œuvre choisie s'intitule **summer 42**.
+TokenizeArt consiste à créer des NFT associés à une image contenant le nombre 42. Je prépare l'image et ses métadonnées sur IPFS, puis j'utilise un smart contract déployé sur BSC Testnet pour créer les NFT, consulter leurs propriétaires et les transférer. L'œuvre choisie s'intitule **summer 42**.
 
 Un **NFT** (*Non-Fungible Token*, ou **jeton non fongible**) est un élément numérique identifié individuellement, dont le propriétaire et les transferts sont enregistrés sur une blockchain. Il peut être associé à une œuvre, comme une image.
 
@@ -19,7 +19,7 @@ Un **NFT** (*Non-Fungible Token*, ou **jeton non fongible**) est un élément nu
 
 ## English version
 
-TokenizerArt consists of creating NFTs associated with an image featuring the number 42. I publish the image and its metadata on IPFS, then use a smart contract deployed on BSC Testnet to mint NFTs, check their owners and transfer them. The chosen artwork is titled **summer 42**.
+TokenizeArt consists of creating NFTs associated with an image featuring the number 42. I publish the image and its metadata on IPFS, then use a smart contract deployed on BSC Testnet to mint NFTs, check their owners and transfer them. The chosen artwork is titled **summer 42**.
 
 An **NFT** (*Non-Fungible Token*) is an individually identified digital item whose owner and transfers are recorded on a blockchain. It can be associated with an artwork, such as an image.
 
