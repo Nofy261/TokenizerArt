@@ -58,13 +58,7 @@ Confirmer la transaction dans MetaMask. Après sa réussite, `ownerOf(tokenId)` 
 
 ## Tests manuels réalisés dans Remix
 
-Les tests suivants ont été effectués avec `account1`, le déployeur, et `account2`, un autre compte :
-
-- Deux appels à `mint()` par `account1` ont créé les NFT `1` et `2`, attribués à `account1`.
-- Les métadonnées et l'image ont été consultées avec succès.
-- Un appel à `mint()` par `account2` a été refusé avec `Only creator can mint` ; le compteur est resté à `2`.
-- `account1` a transféré le NFT `1` à `account2` : chacun possédait alors un NFT et `totalMinted()` valait toujours `2`.
-- `account1` a ensuite tenté de transférer le NFT `1` sans autorisation de `account2` : l'estimation a été refusée avec l'erreur `ERC721InsufficientApproval`. Le NFT est resté à `account2`.
+Tests réalisés dans Remix : mint par le créateur, refus du mint par un autre compte, transfert et refus d’un transfert non autorisé.
 
 ## Bonus — Site de mint
 
@@ -153,13 +147,7 @@ Confirm the transaction in MetaMask. Once it succeeds, `ownerOf(tokenId)` must r
 
 ## Manual tests performed in Remix
 
-The following tests were performed using `account1`, the deployer, and `account2`, another account:
-
-- Two calls to `mint()` by `account1` created NFTs `1` and `2`, both assigned to `account1`.
-- The metadata and image were successfully accessed.
-- A call to `mint()` by `account2` was rejected with `Only creator can mint`; the counter remained at `2`.
-- `account1` transferred NFT `1` to `account2`: each account then held one NFT, and `totalMinted()` still returned `2`.
-- `account1` then attempted to transfer NFT `1` without authorization from `account2`: gas estimation failed with `ERC721InsufficientApproval`. The NFT remained owned by `account2`.
+Tests performed in Remix: minting by the creator, rejection of minting by another account, transfer, and rejection of an unauthorized transfer.
 
 ## Bonus — Minting website
 

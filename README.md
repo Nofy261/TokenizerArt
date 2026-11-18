@@ -1,4 +1,4 @@
-# TokenizerArt — Choix du projet
+# TokenizerArt
 
 ## Version française
 
@@ -17,7 +17,7 @@ Un **NFT** (*Non-Fungible Token*, ou **jeton non fongible**) est un élément nu
 
 ---
 
-## English version — Project choices
+## English version
 
 TokenizerArt consists of creating NFTs associated with an image featuring the number 42. I publish the image and its metadata on IPFS, then use a smart contract deployed on BSC Testnet to mint NFTs, check their owners and transfer them. The chosen artwork is titled **summer 42**.
 
